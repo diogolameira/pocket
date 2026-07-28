@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Franklin:ital,wght@0,600;0,700;1,600&display=swap');
+
+:root {
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --serif: 'Libre Franklin', system-ui, sans-serif;
+  font-family: var(--sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color: #1c241d;
+  background: #f7f8f3;
+}
+
+body { margin: 0; min-width: 320px; min-height: 100vh; }
