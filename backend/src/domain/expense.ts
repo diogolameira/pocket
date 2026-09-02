@@ -34,7 +34,13 @@ export type NewExpense = Omit<Expense, 'id'>
  */
 export type ExpensePatch = Partial<Omit<NewExpense, 'note'>> & { note?: string | null }
 
-export const categoryBudgets: Record<Category, number> = {
+export type Budgets = Record<Category, number>
+
+/**
+ * Seed values used only when a database has no stored budgets yet. Once saved,
+ * the persisted values in the `settings` collection are the source of truth.
+ */
+export const defaultCategoryBudgets: Budgets = {
   Food: 450,
   Transport: 180,
   Shopping: 300,
@@ -162,4 +168,27 @@ export function parseExpensePatch(input: unknown): ValidationResult<ExpensePatch
   }
 
   return { ok: true, value: patch }
+}
+
+/**
+ * Validate an untrusted budgets object. Every category must be present and be a
+ * finite number `>= 0`; unknown keys are ignored.
+ */
+export function parseBudgets(input: unknown): ValidationResult<Budgets> {
+  const body = (input ?? {}) as Record<string, unknown>
+  const errors: string[] = []
+  const result = {} as Budgets
+
+  for (const category of categories) {
+    const raw = body[category]
+    const value = typeof raw === 'number' ? raw : Number(raw)
+    if (!Number.isFinite(value) || value < 0) {
+      errors.push(`\`${category}\` must be a number greater than or equal to zero.`)
+    } else {
+      result[category] = Math.round(value * 100) / 100
+    }
+  }
+
+  if (errors.length > 0) return { ok: false, errors }
+  return { ok: true, value: result }
 }

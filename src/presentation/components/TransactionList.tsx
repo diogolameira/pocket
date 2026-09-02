@@ -11,6 +11,7 @@ type TransactionListProps = {
   onSearchChange: (value: string) => void
   onFilterChange: (value: ExpenseFilter) => void
   onRemove: (id: string) => void
+  onEdit: (expense: Expense) => void
   onAdd: () => void
 }
 
@@ -39,7 +40,10 @@ export function TransactionList(props: TransactionListProps) {
                   <td><span className="tag">{expense.category}</span></td>
                   <td>{formatShortDate(new Date(`${expense.date}T12:00:00`))}</td>
                   <td className="amount">−{formatCurrency(expense.amount)}</td>
-                  <td><button className="delete-button" onClick={() => props.onRemove(expense.id)} aria-label={`Delete ${expense.merchant}`}>×</button></td>
+                  <td className="row-actions">
+                    <button className="row-action" onClick={() => props.onEdit(expense)} aria-label={`Edit ${expense.merchant}`}>✎</button>
+                    <button className="row-action delete" onClick={() => props.onRemove(expense.id)} aria-label={`Delete ${expense.merchant}`}>×</button>
+                  </td>
                 </tr>
               ))}
             </tbody>

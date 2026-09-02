@@ -1,6 +1,14 @@
+import { APP_NAME } from '../../config'
 import { formatCurrency } from '../formatters'
 
-export type AppView = 'Overview' | 'Transactions'
+export type AppView = 'Overview' | 'Transactions' | 'Budgets'
+
+const views: AppView[] = ['Overview', 'Transactions', 'Budgets']
+const viewIcons: Record<AppView, string> = {
+  Overview: '⌁',
+  Transactions: '≡',
+  Budgets: '◧',
+}
 
 type SidebarProps = {
   activeView: AppView
@@ -9,17 +17,15 @@ type SidebarProps = {
 }
 
 export function Sidebar({ activeView, remaining, onViewChange }: SidebarProps) {
-  const views: AppView[] = ['Overview', 'Transactions']
-
   return (
     <aside className="sidebar">
-      <button className="brand" onClick={() => onViewChange('Overview')} aria-label="Pocket home">
-        <span className="brand-mark">P</span><span>Pocket</span>
+      <button className="brand" onClick={() => onViewChange('Overview')} aria-label={`${APP_NAME} home`}>
+        <span className="brand-mark">{APP_NAME.charAt(0)}</span><span>{APP_NAME}</span>
       </button>
       <nav aria-label="Main navigation">
         {views.map(view => (
           <button key={view} className={activeView === view ? 'nav-item active' : 'nav-item'} onClick={() => onViewChange(view)}>
-            <span>{view === 'Overview' ? '⌁' : '≡'}</span>{view}
+            <span>{viewIcons[view]}</span>{view}
           </button>
         ))}
       </nav>
@@ -29,8 +35,8 @@ export function Sidebar({ activeView, remaining, onViewChange }: SidebarProps) {
         <p>{remaining >= 0 ? `${formatCurrency(remaining)} remains in your budget.` : `${formatCurrency(Math.abs(remaining))} over budget.`}</p>
       </div>
       <div className="profile">
-        <span className="avatar">P</span>
-        <div><strong>My pocket</strong><small>Personal workspace</small></div>
+        <span className="avatar">{APP_NAME.charAt(0)}</span>
+        <div><strong>My {APP_NAME.toLowerCase()}</strong><small>Personal workspace</small></div>
       </div>
     </aside>
   )

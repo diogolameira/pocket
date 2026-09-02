@@ -17,11 +17,13 @@ npm run dev            # watch mode on http://localhost:3000
 
 | Path | Role |
 | --- | --- |
-| `src/domain/expense.ts` | Types, categories, budgets, request validation |
+| `src/domain/expense.ts` | Types, categories, default budgets, request validation |
 | `src/env.ts` | Validated environment config |
 | `src/db.ts` | MongoDB connection lifecycle (connect / getDb / disconnect) |
 | `src/repositories/expenseRepository.ts` | CRUD against the `expenses` collection + indexes |
-| `src/routes/expenses.ts` | REST endpoints |
+| `src/repositories/settingsRepository.ts` | Persisted budgets in the `settings` collection |
+| `src/routes/expenses.ts` | Expense REST endpoints |
+| `src/routes/budgets.ts` | Budget REST endpoints |
 | `src/server.ts` | Wiring: JSON, CORS, error handling, graceful shutdown |
 | `src/seed.ts` | `npm run seed` — starter data (`-- --force` to reset) |
 
@@ -37,6 +39,8 @@ Base URL `http://localhost:3000`.
 | `POST` | `/api/expenses` | `NewExpense` | `201` + created `Expense` |
 | `PATCH` | `/api/expenses/:id` | partial `NewExpense` (`note: null` clears) | updated `Expense` or `404` |
 | `DELETE` | `/api/expenses/:id` | — | `204` or `404` |
+| `GET` | `/api/budgets` | — | `Record<Category, number>` (defaults merged in) |
+| `PUT` | `/api/budgets` | `Record<Category, number>` | saved budgets |
 
 Validation failures return `400` with `{ error, details: string[] }`.
 

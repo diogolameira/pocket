@@ -1,19 +1,11 @@
-import { Router, type Request, type Response, type NextFunction } from 'express'
+import { Router, type Request } from 'express'
 import { parseExpensePatch, parseNewExpense } from '../domain/expense.js'
+import { wrap } from '../http/asyncHandler.js'
 import type { ExpenseRepository } from '../repositories/expenseRepository.js'
 
 /** Express param values are loosely typed; narrow to a plain string. */
 function idParam(req: Request): string {
   return String(req.params.id)
-}
-
-/** Wrap an async handler so rejected promises reach the error middleware. */
-function wrap(
-  handler: (req: Request, res: Response) => Promise<unknown>,
-) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    handler(req, res).catch(next)
-  }
 }
 
 export function createExpensesRouter(repo: ExpenseRepository): Router {
