@@ -1,0 +1,16 @@
+node_modules
+dist
+*.log
+
+# Environment / secrets — never commit real values
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets.json
+
+.DS_Store

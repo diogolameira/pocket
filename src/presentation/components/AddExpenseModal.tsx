@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { categories, type Category, type NewExpense } from '../../domain/expense'
 
 type AddExpenseModalProps = {
-  onAdd: (expense: NewExpense) => void
+  onAdd: (expense: NewExpense) => Promise<void>
   onClose: () => void
 }
 
@@ -13,8 +13,9 @@ function toLocalDateInputValue(date: Date): string {
 
 export function AddExpenseModal({ onAdd, onClose }: AddExpenseModalProps) {
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
     const amount = Number(form.get('amount'))
@@ -25,14 +26,22 @@ export function AddExpenseModal({ onAdd, onClose }: AddExpenseModalProps) {
       return
     }
 
-    onAdd({
-      merchant,
-      amount,
-      category: form.get('category') as Category,
-      date: String(form.get('date')),
-      note: String(form.get('note')).trim() || undefined,
-    })
-    onClose()
+    setSubmitting(true)
+    setError('')
+
+    try {
+      await onAdd({
+        merchant,
+        amount,
+        category: form.get('category') as Category,
+        date: String(form.get('date')),
+        note: String(form.get('note')).trim() || undefined,
+      })
+      onClose()
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Could not save the expense.')
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -48,7 +57,7 @@ export function AddExpenseModal({ onAdd, onClose }: AddExpenseModalProps) {
           <label>Category<select name="category">{categories.map(category => <option key={category}>{category}</option>)}</select></label>
           <label>Note <span>(optional)</span><input name="note" placeholder="Add context" /></label>
           {error && <p className="form-error" role="alert">{error}</p>}
-          <div className="modal-actions"><button type="button" className="secondary-button" onClick={onClose}>Cancel</button><button className="primary-button" type="submit">Add expense</button></div>
+          <div className="modal-actions"><button type="button" className="secondary-button" onClick={onClose} disabled={submitting}>Cancel</button><button className="primary-button" type="submit" disabled={submitting}>{submitting ? 'Saving…' : 'Add expense'}</button></div>
         </form>
       </section>
     </div>

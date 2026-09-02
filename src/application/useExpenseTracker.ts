@@ -1,5 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
-import { localExpenseRepository } from './expenseRepository'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  ApiError,
+  httpExpenseRepository,
+  type ExpensePatch,
+  type ExpenseRepository,
+} from './expenseRepository'
 import {
   calculateCategoryTotal,
   calculateTotal,
@@ -11,19 +16,40 @@ import {
 } from '../domain/expense'
 
 export type ExpenseFilter = 'All' | Category
+export type LoadStatus = 'loading' | 'ready' | 'error'
 
-export function useExpenseTracker() {
-  const [expenses, setExpenses] = useState<Expense[]>(localExpenseRepository.getAll)
+function messageFrom(error: unknown): string {
+  if (error instanceof ApiError || error instanceof Error) return error.message
+  return 'Something went wrong.'
+}
+
+export function useExpenseTracker(repository: ExpenseRepository = httpExpenseRepository) {
+  const [expenses, setExpenses] = useState<Expense[]>([])
+  const [status, setStatus] = useState<LoadStatus>('loading')
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<ExpenseFilter>('All')
 
+  const load = useCallback(async () => {
+    setStatus('loading')
+    setLoadError(null)
+    try {
+      setExpenses(await repository.list())
+      setStatus('ready')
+    } catch (error) {
+      setLoadError(messageFrom(error))
+      setStatus('error')
+    }
+  }, [repository])
+
   useEffect(() => {
-    localExpenseRepository.save(expenses)
-  }, [expenses])
+    void load()
+  }, [load])
 
   const total = useMemo(() => calculateTotal(expenses), [expenses])
   const monthBudget = useMemo(
-    () => Object.values(categoryBudgets).reduce((total, budget) => total + budget, 0),
+    () => Object.values(categoryBudgets).reduce((sum, budget) => sum + budget, 0),
     [],
   )
 
@@ -39,18 +65,38 @@ export function useExpenseTracker() {
     return matchesCategory && searchableText.includes(search.trim().toLowerCase())
   }), [expenses, filter, search])
 
-  function addExpense(newExpense: NewExpense) {
-    const expense: Expense = { ...newExpense, id: crypto.randomUUID() }
-    setExpenses(current => [expense, ...current])
-  }
+  const addExpense = useCallback(async (newExpense: NewExpense) => {
+    setActionError(null)
+    const created = await repository.create(newExpense)
+    setExpenses(current => [created, ...current])
+  }, [repository])
 
-  function removeExpense(id: string) {
+  const updateExpense = useCallback(async (id: string, patch: ExpensePatch) => {
+    setActionError(null)
+    const updated = await repository.update(id, patch)
+    setExpenses(current => current.map(expense => (expense.id === id ? updated : expense)))
+  }, [repository])
+
+  const removeExpense = useCallback(async (id: string) => {
+    setActionError(null)
+    const snapshot = expenses
     setExpenses(current => current.filter(expense => expense.id !== id))
-  }
+    try {
+      await repository.remove(id)
+    } catch (error) {
+      setExpenses(snapshot)
+      setActionError(messageFrom(error))
+    }
+  }, [expenses, repository])
 
   return {
     expenses,
     visibleExpenses,
+    status,
+    loadError,
+    actionError,
+    dismissActionError: () => setActionError(null),
+    reload: load,
     total,
     monthBudget,
     remaining: monthBudget - total,
@@ -60,6 +106,7 @@ export function useExpenseTracker() {
     setSearch,
     setFilter,
     addExpense,
+    updateExpense,
     removeExpense,
   }
 }
