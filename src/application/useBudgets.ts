@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { httpBudgetRepository, type BudgetRepository } from './budgetRepository'
+import type { BudgetRepository } from './budgetRepository'
 import { defaultCategoryBudgets, type Budgets } from '../domain/expense'
 
 export type BudgetsStatus = 'loading' | 'ready' | 'error'
@@ -8,7 +8,7 @@ function messageFrom(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback
 }
 
-export function useBudgets(repository: BudgetRepository = httpBudgetRepository) {
+export function useBudgets(repository: BudgetRepository) {
   const [budgets, setBudgets] = useState<Budgets>(defaultCategoryBudgets)
   const [status, setStatus] = useState<BudgetsStatus>('loading')
   const [error, setError] = useState<string | null>(null)

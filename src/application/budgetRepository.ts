@@ -1,14 +1,10 @@
 import type { Budgets } from '../domain/expense'
-import { apiRequest } from './apiClient'
 
+/**
+ * Port: how the application reads and writes category budgets. Implemented by an
+ * adapter in `infrastructure/` and bound in `composition.ts`.
+ */
 export interface BudgetRepository {
   get(): Promise<Budgets>
   save(budgets: Budgets): Promise<Budgets>
-}
-
-const ENDPOINT = '/api/budgets'
-
-export const httpBudgetRepository: BudgetRepository = {
-  get: () => apiRequest<Budgets>(ENDPOINT),
-  save: budgets => apiRequest<Budgets>(ENDPOINT, { method: 'PUT', body: JSON.stringify(budgets) }),
 }

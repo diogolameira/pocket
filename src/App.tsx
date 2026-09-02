@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useBudgets } from './application/useBudgets'
 import { useExpenseTracker } from './application/useExpenseTracker'
+import { repositories } from './composition'
 import { BudgetsView } from './presentation/components/BudgetsView'
 import { CategoryDonut } from './presentation/components/CategoryDonut'
 import { CategoryOverview } from './presentation/components/CategoryOverview'
@@ -22,8 +23,8 @@ const viewTitles: Record<AppView, string> = {
 }
 
 function App() {
-  const budgets = useBudgets()
-  const tracker = useExpenseTracker(budgets.budgets)
+  const budgets = useBudgets(repositories.budgets)
+  const tracker = useExpenseTracker(budgets.budgets, repositories.expenses)
   const [view, setView] = useState<AppView>('Overview')
   const [modal, setModal] = useState<ModalState>(null)
 

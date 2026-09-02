@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TREND_MONTHS } from '../config'
-import { ApiError } from './apiClient'
-import {
-  httpExpenseRepository,
-  type ExpensePatch,
-  type ExpenseRepository,
-} from './expenseRepository'
+import type { ExpensePatch, ExpenseRepository } from './expenseRepository'
 import {
   calculateTotal,
   summariseByCategory,
@@ -32,14 +27,11 @@ export type LoadStatus = 'loading' | 'ready' | 'error'
 export type TrendPoint = { month: MonthKey; total: number }
 
 function messageFrom(error: unknown): string {
-  if (error instanceof ApiError || error instanceof Error) return error.message
+  if (error instanceof Error) return error.message
   return 'Something went wrong.'
 }
 
-export function useExpenseTracker(
-  budgets: Budgets,
-  repository: ExpenseRepository = httpExpenseRepository,
-) {
+export function useExpenseTracker(budgets: Budgets, repository: ExpenseRepository) {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [status, setStatus] = useState<LoadStatus>('loading')
   const [loadError, setLoadError] = useState<string | null>(null)
