@@ -34,6 +34,19 @@ export const env = {
   dbName: process.env.MONGODB_DB ?? 'expenses',
   port: optionalNumber('PORT', 3000),
   /**
+   * Statement-import feature. Optional at boot — the rest of the API works
+   * without it — but required by `POST /api/import/parse`, which reports a
+   * clear error if it's missing rather than crashing the server on startup.
+   */
+  geminiApiKey: process.env.GEMINI_API_KEY,
+  /**
+   * Cheap, fast model — statement extraction doesn't need a frontier model.
+   * Pinned to a concrete model rather than a `-latest` alias: Google throttles
+   * older/aliased models for newer API keys with 503 "high demand" errors and
+   * explicitly directs new projects to the current Flash-Lite tier instead.
+   */
+  geminiModel: process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite',
+  /**
    * Whether a browser `Origin` is allowed. Any localhost origin passes (dev
    * servers hop ports), plus anything listed in CORS_ORIGIN.
    */

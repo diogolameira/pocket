@@ -1,4 +1,4 @@
-import { categoryIcons, type CategorySummary } from '../../domain/expense'
+import { categoryIcons, categorySlug, type CategorySummary } from '../../domain/expense'
 import { formatCurrency } from '../formatters'
 
 type CategoryOverviewProps = {
@@ -18,7 +18,7 @@ export function CategoryOverview({ summaries, onViewAll }: CategoryOverviewProps
           const ratio = budget > 0 ? Math.min((total / budget) * 100, 100) : 0
           return (
             <article className="category-card" key={category}>
-              <div className={`category-icon ${category.toLowerCase()}`}>{categoryIcons[category]}</div>
+              <div className={`category-icon ${categorySlug(category)}`}>{categoryIcons[category]}</div>
               <div className="category-copy"><span>{category}</span><strong>{formatCurrency(total)}</strong></div>
               <span className="category-meta">of {formatCurrency(budget)}</span>
               <div className="category-bar"><span style={{ width: `${ratio}%` }} /></div>

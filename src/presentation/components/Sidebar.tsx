@@ -1,13 +1,14 @@
 import { APP_NAME } from '../../config'
 import { formatCurrency } from '../formatters'
 
-export type AppView = 'Overview' | 'Transactions' | 'Budgets'
+export type AppView = 'Overview' | 'Transactions' | 'Budgets' | 'Import'
 
-const views: AppView[] = ['Overview', 'Transactions', 'Budgets']
+const views: AppView[] = ['Overview', 'Transactions', 'Budgets', 'Import']
 const viewIcons: Record<AppView, string> = {
   Overview: '⌁',
   Transactions: '≡',
   Budgets: '◧',
+  Import: '⇧',
 }
 
 type SidebarProps = {

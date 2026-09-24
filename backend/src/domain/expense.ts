@@ -7,12 +7,18 @@
  */
 
 export const categories = [
-  'Food',
+  'Groceries',
+  'Restaurants & Cafes',
   'Transport',
-  'Shopping',
-  'Home',
+  'Fuel',
+  'Housing & Utilities',
   'Subscriptions',
   'Health',
+  'Shopping',
+  'Entertainment',
+  'Travel',
+  'Income',
+  'Other',
 ] as const
 
 export type Category = (typeof categories)[number]
@@ -41,12 +47,18 @@ export type Budgets = Record<Category, number>
  * the persisted values in the `settings` collection are the source of truth.
  */
 export const defaultCategoryBudgets: Budgets = {
-  Food: 450,
-  Transport: 180,
-  Shopping: 300,
-  Home: 650,
-  Subscriptions: 120,
-  Health: 160,
+  Groceries: 400,
+  'Restaurants & Cafes': 150,
+  Transport: 100,
+  Fuel: 120,
+  'Housing & Utilities': 650,
+  Subscriptions: 60,
+  Health: 100,
+  Shopping: 200,
+  Entertainment: 80,
+  Travel: 100,
+  Income: 0,
+  Other: 50,
 }
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/

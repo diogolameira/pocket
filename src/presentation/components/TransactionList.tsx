@@ -1,4 +1,4 @@
-import { categories, categoryIcons, type Category, type Expense } from '../../domain/expense'
+import { categories, categoryIcons, categorySlug, type Category, type Expense } from '../../domain/expense'
 import type { ExpenseFilter } from '../../application/useExpenseTracker'
 import type { AppView } from './Sidebar'
 import { formatCurrency, formatShortDate } from '../formatters'
@@ -36,10 +36,12 @@ export function TransactionList(props: TransactionListProps) {
             <tbody>
               {displayedExpenses.map(expense => (
                 <tr key={expense.id}>
-                  <td><div className="merchant"><span className={`merchant-icon ${expense.category.toLowerCase()}`}>{categoryIcons[expense.category]}</span><span><strong>{expense.merchant}</strong>{expense.note && <small>{expense.note}</small>}</span></div></td>
+                  <td><div className="merchant"><span className={`merchant-icon ${categorySlug(expense.category)}`}>{categoryIcons[expense.category]}</span><span><strong>{expense.merchant}</strong>{expense.note && <small>{expense.note}</small>}</span></div></td>
                   <td><span className="tag">{expense.category}</span></td>
                   <td>{formatShortDate(new Date(`${expense.date}T12:00:00`))}</td>
-                  <td className="amount">−{formatCurrency(expense.amount)}</td>
+                  <td className={expense.category === 'Income' ? 'amount positive' : 'amount'}>
+                    {expense.category === 'Income' ? '+' : '−'}{formatCurrency(expense.amount)}
+                  </td>
                   <td className="row-actions">
                     <button className="row-action" onClick={() => props.onEdit(expense)} aria-label={`Edit ${expense.merchant}`}>✎</button>
                     <button className="row-action delete" onClick={() => props.onRemove(expense.id)} aria-label={`Delete ${expense.merchant}`}>×</button>

@@ -6,6 +6,7 @@ import { BudgetsView } from './presentation/components/BudgetsView'
 import { CategoryDonut } from './presentation/components/CategoryDonut'
 import { CategoryOverview } from './presentation/components/CategoryOverview'
 import { ExpenseModal } from './presentation/components/ExpenseModal'
+import { ImportView } from './presentation/components/ImportView'
 import { MonthNavigator } from './presentation/components/MonthNavigator'
 import { Sidebar, type AppView } from './presentation/components/Sidebar'
 import { SummaryCards } from './presentation/components/SummaryCards'
@@ -20,6 +21,7 @@ const viewTitles: Record<AppView, string> = {
   Overview: 'Your spending overview',
   Transactions: 'Transactions',
   Budgets: 'Budgets',
+  Import: 'Import a statement',
 }
 
 function App() {
@@ -63,17 +65,21 @@ function App() {
       <main className="main-content">
         <header className="topbar">
           <div>
-            <MonthNavigator
-              label={tracker.monthLabel}
-              canGoNext={tracker.canGoToNextMonth}
-              isCurrent={tracker.isViewingCurrentMonth}
-              onPrevious={tracker.goToPreviousMonth}
-              onNext={tracker.goToNextMonth}
-              onReset={tracker.resetToCurrentMonth}
-            />
+            {view !== 'Import' && (
+              <MonthNavigator
+                label={tracker.monthLabel}
+                canGoNext={tracker.canGoToNextMonth}
+                isCurrent={tracker.isViewingCurrentMonth}
+                onPrevious={tracker.goToPreviousMonth}
+                onNext={tracker.goToNextMonth}
+                onReset={tracker.resetToCurrentMonth}
+              />
+            )}
             <h1>{viewTitles[view]}</h1>
           </div>
-          <button className="primary-button" onClick={() => setModal({ mode: 'add' })} disabled={!ready}><span>＋</span> Add expense</button>
+          {view !== 'Import' && (
+            <button className="primary-button" onClick={() => setModal({ mode: 'add' })} disabled={!ready}><span>＋</span> Add expense</button>
+          )}
         </header>
 
         {tracker.actionError && (
@@ -124,6 +130,10 @@ function App() {
             error={budgets.error}
             onSave={budgets.save}
           />
+        )}
+
+        {ready && view === 'Import' && (
+          <ImportView repository={repositories.import} onSaveExpense={tracker.addExpense} />
         )}
       </main>
 

@@ -5,6 +5,7 @@ import { ExpenseRepository } from './repositories/expenseRepository.js'
 import { SettingsRepository } from './repositories/settingsRepository.js'
 import { createBudgetsRouter } from './routes/budgets.js'
 import { createExpensesRouter } from './routes/expenses.js'
+import { createImportRouter } from './routes/import.js'
 
 async function start() {
   const db = await connect()
@@ -39,6 +40,7 @@ async function start() {
 
   app.use('/api/expenses', createExpensesRouter(expenseRepository))
   app.use('/api/budgets', createBudgetsRouter(settingsRepository))
+  app.use('/api/import', createImportRouter())
 
   app.use((_req, res) => {
     res.status(404).json({ error: 'Not found.' })

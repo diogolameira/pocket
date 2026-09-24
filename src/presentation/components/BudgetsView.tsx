@@ -2,6 +2,8 @@ import { useState } from 'react'
 import {
   categories,
   categoryIcons,
+  categorySlug,
+  spendingCategories,
   totalBudget,
   type Budgets,
   type CategorySummary,
@@ -47,14 +49,14 @@ export function BudgetsView({ budgets, summaries, monthLabel, saving, error, onS
       </div>
 
       <div className="budget-list">
-        {categories.map(category => {
+        {spendingCategories.map(category => {
           const limit = draft[category]
           const spent = spentByCategory.get(category) ?? 0
           const ratio = limit > 0 ? Math.min(spent / limit, 1) : 0
           const over = limit > 0 && spent > limit
           return (
             <div className="budget-row" key={category}>
-              <div className={`category-icon ${category.toLowerCase()}`}>{categoryIcons[category]}</div>
+              <div className={`category-icon ${categorySlug(category)}`}>{categoryIcons[category]}</div>
               <div className="budget-row-main">
                 <div className="budget-row-top">
                   <span>{category}</span>

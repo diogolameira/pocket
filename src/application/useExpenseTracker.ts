@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TREND_MONTHS } from '../config'
 import type { ExpensePatch, ExpenseRepository } from './expenseRepository'
 import {
-  calculateTotal,
+  calculateSpendTotal,
   summariseByCategory,
   totalBudget,
   type Budgets,
@@ -67,7 +67,7 @@ export function useExpenseTracker(budgets: Budgets, repository: ExpenseRepositor
     [expenses, selectedMonth],
   )
 
-  const total = useMemo(() => calculateTotal(monthExpenses), [monthExpenses])
+  const total = useMemo(() => calculateSpendTotal(monthExpenses), [monthExpenses])
   const monthBudget = useMemo(() => totalBudget(budgets), [budgets])
   const categorySummaries = useMemo(
     () => summariseByCategory(monthExpenses, budgets),
@@ -83,6 +83,7 @@ export function useExpenseTracker(budgets: Budgets, repository: ExpenseRepositor
   const trend = useMemo<TrendPoint[]>(() => {
     const totalsByMonth = new Map<MonthKey, number>()
     for (const expense of expenses) {
+      if (expense.category === 'Income') continue
       const key = monthKeyFromDate(expense.date)
       totalsByMonth.set(key, (totalsByMonth.get(key) ?? 0) + expense.amount)
     }
